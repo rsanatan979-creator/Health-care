@@ -1,40 +1,39 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
+import { defineConfig, Plugin } from "vite";
+import react from "@vitejs/plugin-react-swc";
 import path from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
+import { createServer } from "./server";
 
-export default defineConfig({
-  plugins: [
-    react(),
-    runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-          await import("@replit/vite-plugin-dev-banner").then((m) =>
-            m.devBanner(),
-          ),
-        ]
-      : []),
-  ],
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
+  server: {
+    host: "0.0.0.0", allowedHosts: true,
+    port: 5000,
+    fs: {
+      allow: [".", "./client", "./shared"],
+      deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
+    },
+  },
+  build: {
+    outDir: "dist/spa",
+  },
+  plugins: [react(), expressPlugin()],
   resolve: {
     alias: {
-      "@": path.resolve(import.meta.dirname, "client", "src"),
-      "@shared": path.resolve(import.meta.dirname, "shared"),
-      "@assets": path.resolve(import.meta.dirname, "attached_assets"),
+      "@": path.resolve(__dirname, "./client"),
+      "@shared": path.resolve(__dirname, "./shared"),
     },
   },
-  root: path.resolve(import.meta.dirname, "client"),
-  build: {
-    outDir: path.resolve(import.meta.dirname, "dist/public"),
-    emptyOutDir: true,
-  },
-  server: {
-    fs: {
-      strict: true,
-      deny: ["**/.*"],
+}));
+
+function expressPlugin(): Plugin {
+  return {
+    name: "express-plugin",
+    apply: "serve", // Only apply during development (serve mode)
+    configureServer(server) {
+      const app = createServer();
+
+      // Add Express app as middleware to Vite dev server
+      server.middlewares.use(app);
     },
-  },
-});
+  };
+}

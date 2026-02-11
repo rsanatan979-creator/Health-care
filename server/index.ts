@@ -1,103 +1,217 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { serveStatic } from "./static";
-import { createServer } from "http";
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import { db } from "./db";
+import { handleDemo } from "./routes/demo";
+import {
+  getPatients,
+  getPatientById,
+  createPatient,
+  updatePatient,
+} from "./routes/patients";
+import { getDoctors, getDoctorById, getAvailableDoctors, updateDoctorStatus } from "./routes/doctors";
+import { getQueueStatus, updateQueue, getQueueAnalytics } from "./routes/queue";
+import { predictWaitTime, optimizeQueue, predictPeakHours } from "./routes/predict";
 
-const app = express();
-const httpServer = createServer(app);
+export function createServer() {
+  const app = express();
 
-declare module "http" {
-  interface IncomingMessage {
-    rawBody: unknown;
-  }
-}
+  // Middleware
+  app.use(cors());
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  express.json({
-    verify: (req, _res, buf) => {
-      req.rawBody = buf;
-    },
-  }),
-);
-
-app.use(express.urlencoded({ extended: false }));
-
-export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
+  // Request logging middleware
+  app.use((req, _res, next) => {
+    if (req.path.startsWith("/api")) {
+      console.log(`[API] ${req.method} ${req.path}`);
+    }
+    next();
   });
 
-  console.log(`${formattedTime} [${source}] ${message}`);
-}
-
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      log(logLine);
+  // Health check
+  app.get("/api/ping", (_req, res) => {
+    try {
+      const ping = process.env.PING_MESSAGE ?? "pong";
+      res.json({ message: ping });
+    } catch (error) {
+      console.error("Error in /api/ping:", error);
+      res.status(500).json({ success: false, error: "Internal server error" });
     }
   });
 
-  next();
-});
-
-(async () => {
-  await registerRoutes(httpServer, app);
-
-  app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    console.error("Internal Server Error:", err);
-
-    if (res.headersSent) {
-      return next(err);
+  // Example demo route
+  app.get("/api/demo", (_req, res) => {
+    try {
+      handleDemo(_req, res);
+    } catch (error) {
+      console.error("Error in /api/demo:", error);
+      res.status(500).json({ success: false, error: "Internal server error" });
     }
-
-    return res.status(status).json({ message });
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (process.env.NODE_ENV === "production") {
-    serveStatic(app);
-  } else {
-    const { setupVite } = await import("./vite");
-    await setupVite(httpServer, app);
-  }
+  // ==================== PATIENT ROUTES ====================
+  /**
+   * Get all patients: GET /api/patients
+   * Get specific patient: GET /api/patients/:id
+   * Create patient: POST /api/patients
+   * Update patient: PUT /api/patients/:id
+   */
+  app.get("/api/patients", (req, res) => {
+    try {
+      getPatients(req, res);
+    } catch (error) {
+      console.error("Error in /api/patients:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch patients" });
+    }
+  });
+  app.get("/api/patients/:id", (req, res) => {
+    try {
+      getPatientById(req, res);
+    } catch (error) {
+      console.error("Error in /api/patients/:id:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch patient" });
+    }
+  });
+  app.post("/api/patients", (req, res) => {
+    try {
+      createPatient(req, res);
+    } catch (error) {
+      console.error("Error in POST /api/patients:", error);
+      res.status(500).json({ success: false, error: "Failed to create patient" });
+    }
+  });
+  app.put("/api/patients/:id", (req, res) => {
+    try {
+      updatePatient(req, res);
+    } catch (error) {
+      console.error("Error in PUT /api/patients/:id:", error);
+      res.status(500).json({ success: false, error: "Failed to update patient" });
+    }
+  });
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || "5000", 10);
-  httpServer.listen(
-    {
-      port,
-      host: "0.0.0.0",
-      reusePort: true,
-    },
-    () => {
-      log(`serving on port ${port}`);
-    },
-  );
-})();
+  // ==================== DOCTOR ROUTES ====================
+  /**
+   * Get all doctors: GET /api/doctors
+   * Get specific doctor: GET /api/doctors/:id
+   * Get available doctors: GET /api/doctors/available
+   * Update doctor status: PUT /api/doctors/:id
+   */
+  app.get("/api/doctors", (req, res) => {
+    try {
+      getDoctors(req, res);
+    } catch (error) {
+      console.error("Error in /api/doctors:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch doctors" });
+    }
+  });
+  app.get("/api/doctors/:id", (req, res) => {
+    try {
+      getDoctorById(req, res);
+    } catch (error) {
+      console.error("Error in /api/doctors/:id:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch doctor" });
+    }
+  });
+  app.get("/api/doctors/available", (req, res) => {
+    try {
+      getAvailableDoctors(req, res);
+    } catch (error) {
+      console.error("Error in /api/doctors/available:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch available doctors" });
+    }
+  });
+  app.put("/api/doctors/:id", (req, res) => {
+    try {
+      updateDoctorStatus(req, res);
+    } catch (error) {
+      console.error("Error in PUT /api/doctors/:id:", error);
+      res.status(500).json({ success: false, error: "Failed to update doctor" });
+    }
+  });
+
+  // ==================== QUEUE ROUTES ====================
+  /**
+   * Get queue status: GET /api/queue
+   * Update queue: POST /api/queue/update
+   * Get analytics: GET /api/queue/analytics
+   */
+  app.get("/api/queue", (req, res) => {
+    try {
+      getQueueStatus(req, res);
+    } catch (error) {
+      console.error("Error in /api/queue:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch queue" });
+    }
+  });
+  app.post("/api/queue/update", (req, res) => {
+    try {
+      updateQueue(req, res);
+    } catch (error) {
+      console.error("Error in /api/queue/update:", error);
+      res.status(500).json({ success: false, error: "Failed to update queue" });
+    }
+  });
+  app.get("/api/queue/analytics", (req, res) => {
+    try {
+      getQueueAnalytics(req, res);
+    } catch (error) {
+      console.error("Error in /api/queue/analytics:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch analytics" });
+    }
+  });
+
+  // ==================== PREDICTION ROUTES (AI) ====================
+  /**
+   * Predict wait time: GET /api/predict/wait-time/:patientId
+   * Optimize queue: GET /api/predict/optimize-queue
+   * Predict peak hours: GET /api/predict/peak-hours
+   */
+  app.get("/api/predict/wait-time/:patientId", (req, res) => {
+    try {
+      predictWaitTime(req, res);
+    } catch (error) {
+      console.error("Error in /api/predict/wait-time:", error);
+      res.status(500).json({ success: false, error: "Failed to predict wait time" });
+    }
+  });
+  app.get("/api/predict/optimize-queue", (req, res) => {
+    try {
+      optimizeQueue(req, res);
+    } catch (error) {
+      console.error("Error in /api/predict/optimize-queue:", error);
+      res.status(500).json({ success: false, error: "Failed to optimize queue" });
+    }
+  });
+  app.get("/api/predict/peak-hours", (req, res) => {
+    try {
+      predictPeakHours(req, res);
+    } catch (error) {
+      console.error("Error in /api/predict/peak-hours:", error);
+      res.status(500).json({ success: false, error: "Failed to predict peak hours" });
+    }
+  });
+
+  // ==================== HOSPITAL ROUTES ====================
+  app.get("/api/hospitals", (_req, res) => {
+    try {
+      const hospitalList = db.getHospitals();
+      res.json({ success: true, data: hospitalList });
+    } catch (error) {
+      console.error("Error in /api/hospitals:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch hospitals" });
+    }
+  });
+
+  // Error handling middleware
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    console.error("Unhandled error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Internal server error",
+      message: err.message || "Unknown error",
+    });
+  });
+
+  return app;
+}

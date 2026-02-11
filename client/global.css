@@ -1,0 +1,166 @@
+/** @import must precede all other statements */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /**
+   * Healthcare-themed color palette
+   * Tailwind CSS theme using HSL values
+  */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 217 33% 17%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;
+
+    /* Medical blue - primary brand color */
+    --primary: 207 100% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Health green - secondary action */
+    --secondary: 160 84% 39%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 13.8% 34.2%;
+
+    /* Alert orange for emergencies */
+    --accent: 22 96% 56%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 207 100% 50%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 217 33% 17%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 207 100% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 160 84% 39%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 33% 25%;
+    --sidebar-ring: 207 100% 50%;
+
+    /* Healthcare specific colors */
+    --success: 160 84% 39%;
+    --warning: 45 93% 47%;
+    --error: 0 84.2% 60.2%;
+    --info: 207 100% 50%;
+  }
+
+  .dark {
+    --background: 217 33% 15%;
+    --foreground: 210 40% 98%;
+
+    --card: 217 33% 22%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 217 33% 22%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 207 100% 55%;
+    --primary-foreground: 217 33% 17%;
+
+    --secondary: 160 84% 45%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 217 32.6% 27%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 22 96% 56%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 217 33% 27%;
+    --input: 217 33% 27%;
+    --ring: 207 100% 55%;
+
+    --sidebar-background: 217 33% 12%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 207 100% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 160 84% 45%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 217 33% 20%;
+    --sidebar-ring: 207 100% 55%;
+
+    --success: 160 84% 45%;
+    --warning: 45 93% 55%;
+    --error: 0 84% 56%;
+    --info: 207 100% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-foreground;
+  }
+
+  :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  pre,
+  code {
+    overflow-x: auto;
+    white-space: pre;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/20 dark:bg-slate-900/70 dark:border-slate-700/50;
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:scale-105;
+  }
+
+  .pulse-animation {
+    animation: pulse-custom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes pulse-custom {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
