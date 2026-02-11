@@ -290,7 +290,7 @@ export const db = {
         hour: "2-digit",
         minute: "2-digit",
       }),
-      estimatedWait: patientData.status === "in-progress" ? 0 : (Math.floor(Math.random() * 30) + 5),
+      estimatedWait: patientData.status === "in-progress" ? 0 : (Math.floor(Math.random() * 4) + 3),
       status: patientData.status || "waiting",
     };
     patients.push(newPatient);
@@ -386,8 +386,16 @@ export const db = {
   // Simulation - update wait times
   simulateQueueUpdate: () => {
     patients.forEach((patient) => {
+      const oldWait = patient.estimatedWait;
       if (patient.estimatedWait > 0) {
         patient.estimatedWait = Math.max(0, patient.estimatedWait - 1);
+      }
+      
+      // Reminder logic: Send reminder 30 seconds (0.5 mins) before appointment
+      // Since our simulation decrements by 1 minute, we'll trigger it when it hits 1 min or 0 mins
+      if (oldWait > 0.5 && patient.estimatedWait <= 0.5 && patient.status === "waiting") {
+        console.log(`[REMINDER] Sending SMS to ${patient.phone}: Your appointment for ${patient.symptom} is starting in 30 seconds!`);
+        console.log(`[REMINDER] Sending Email to ${patient.email}: Hello ${patient.firstName}, please proceed to the consultation room in 30 seconds.`);
       }
     });
   },
