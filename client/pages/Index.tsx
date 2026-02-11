@@ -108,9 +108,14 @@ const Index = () => {
     loadData();
 
     // Set up polling for real-time updates (every 5 seconds)
-    const interval = setInterval(() => {
-      fetchQueueData();
-      fetchDoctorData();
+    const interval = setInterval(async () => {
+      try {
+        await fetch("/api/queue/update", { method: "POST" });
+        fetchQueueData();
+        fetchDoctorData();
+      } catch (error) {
+        console.error("Error updating queue simulation:", error);
+      }
     }, 5000);
 
     return () => clearInterval(interval);
