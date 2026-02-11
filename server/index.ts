@@ -30,7 +30,7 @@ export function createServer() {
   });
 
   // Health check
-  app.get("/api/ping", (_req, res) => {
+  app.get("/api/ping", (_req, res, _next) => {
     try {
       const ping = process.env.PING_MESSAGE ?? "pong";
       res.json({ message: ping });
@@ -41,9 +41,9 @@ export function createServer() {
   });
 
   // Example demo route
-  app.get("/api/demo", (_req, res) => {
+  app.get("/api/demo", (req, res, next) => {
     try {
-      handleDemo(_req, res);
+      handleDemo(req, res, next);
     } catch (error) {
       console.error("Error in /api/demo:", error);
       res.status(500).json({ success: false, error: "Internal server error" });
@@ -57,33 +57,33 @@ export function createServer() {
    * Create patient: POST /api/patients
    * Update patient: PUT /api/patients/:id
    */
-  app.get("/api/patients", (req, res) => {
+  app.get("/api/patients", (req, res, next) => {
     try {
-      getPatients(req, res);
+      getPatients(req, res, next);
     } catch (error) {
       console.error("Error in /api/patients:", error);
       res.status(500).json({ success: false, error: "Failed to fetch patients" });
     }
   });
-  app.get("/api/patients/:id", (req, res) => {
+  app.get("/api/patients/:id", (req, res, next) => {
     try {
-      getPatientById(req, res);
+      getPatientById(req, res, next);
     } catch (error) {
       console.error("Error in /api/patients/:id:", error);
       res.status(500).json({ success: false, error: "Failed to fetch patient" });
     }
   });
-  app.post("/api/patients", (req, res) => {
+  app.post("/api/patients", (req, res, next) => {
     try {
-      createPatient(req, res);
+      createPatient(req, res, next);
     } catch (error) {
       console.error("Error in POST /api/patients:", error);
       res.status(500).json({ success: false, error: "Failed to create patient" });
     }
   });
-  app.put("/api/patients/:id", (req, res) => {
+  app.put("/api/patients/:id", (req, res, next) => {
     try {
-      updatePatient(req, res);
+      updatePatient(req, res, next);
     } catch (error) {
       console.error("Error in PUT /api/patients/:id:", error);
       res.status(500).json({ success: false, error: "Failed to update patient" });
@@ -97,33 +97,33 @@ export function createServer() {
    * Get available doctors: GET /api/doctors/available
    * Update doctor status: PUT /api/doctors/:id
    */
-  app.get("/api/doctors", (req, res) => {
+  app.get("/api/doctors", (req, res, next) => {
     try {
-      getDoctors(req, res);
+      getDoctors(req, res, next);
     } catch (error) {
       console.error("Error in /api/doctors:", error);
       res.status(500).json({ success: false, error: "Failed to fetch doctors" });
     }
   });
-  app.get("/api/doctors/:id", (req, res) => {
+  app.get("/api/doctors/:id", (req, res, next) => {
     try {
-      getDoctorById(req, res);
+      getDoctorById(req, res, next);
     } catch (error) {
       console.error("Error in /api/doctors/:id:", error);
       res.status(500).json({ success: false, error: "Failed to fetch doctor" });
     }
   });
-  app.get("/api/doctors/available", (req, res) => {
+  app.get("/api/doctors/available", (req, res, next) => {
     try {
-      getAvailableDoctors(req, res);
+      getAvailableDoctors(req, res, next);
     } catch (error) {
       console.error("Error in /api/doctors/available:", error);
       res.status(500).json({ success: false, error: "Failed to fetch available doctors" });
     }
   });
-  app.put("/api/doctors/:id", (req, res) => {
+  app.put("/api/doctors/:id", (req, res, next) => {
     try {
-      updateDoctorStatus(req, res);
+      updateDoctorStatus(req, res, next);
     } catch (error) {
       console.error("Error in PUT /api/doctors/:id:", error);
       res.status(500).json({ success: false, error: "Failed to update doctor" });
@@ -136,25 +136,25 @@ export function createServer() {
    * Update queue: POST /api/queue/update
    * Get analytics: GET /api/queue/analytics
    */
-  app.get("/api/queue", (req, res) => {
+  app.get("/api/queue", (req, res, next) => {
     try {
-      getQueueStatus(req, res);
+      getQueueStatus(req, res, next);
     } catch (error) {
       console.error("Error in /api/queue:", error);
       res.status(500).json({ success: false, error: "Failed to fetch queue" });
     }
   });
-  app.post("/api/queue/update", (req, res) => {
+  app.post("/api/queue/update", (req, res, next) => {
     try {
-      updateQueue(req, res);
+      updateQueue(req, res, next);
     } catch (error) {
       console.error("Error in /api/queue/update:", error);
       res.status(500).json({ success: false, error: "Failed to update queue" });
     }
   });
-  app.get("/api/queue/analytics", (req, res) => {
+  app.get("/api/queue/analytics", (req, res, next) => {
     try {
-      getQueueAnalytics(req, res);
+      getQueueAnalytics(req, res, next);
     } catch (error) {
       console.error("Error in /api/queue/analytics:", error);
       res.status(500).json({ success: false, error: "Failed to fetch analytics" });
@@ -167,25 +167,25 @@ export function createServer() {
    * Optimize queue: GET /api/predict/optimize-queue
    * Predict peak hours: GET /api/predict/peak-hours
    */
-  app.get("/api/predict/wait-time/:patientId", (req, res) => {
+  app.get("/api/predict/wait-time/:patientId", (req, res, next) => {
     try {
-      predictWaitTime(req, res);
+      predictWaitTime(req, res, next);
     } catch (error) {
       console.error("Error in /api/predict/wait-time:", error);
       res.status(500).json({ success: false, error: "Failed to predict wait time" });
     }
   });
-  app.get("/api/predict/optimize-queue", (req, res) => {
+  app.get("/api/predict/optimize-queue", (req, res, next) => {
     try {
-      optimizeQueue(req, res);
+      optimizeQueue(req, res, next);
     } catch (error) {
       console.error("Error in /api/predict/optimize-queue:", error);
       res.status(500).json({ success: false, error: "Failed to optimize queue" });
     }
   });
-  app.get("/api/predict/peak-hours", (req, res) => {
+  app.get("/api/predict/peak-hours", (req, res, next) => {
     try {
-      predictPeakHours(req, res);
+      predictPeakHours(req, res, next);
     } catch (error) {
       console.error("Error in /api/predict/peak-hours:", error);
       res.status(500).json({ success: false, error: "Failed to predict peak hours" });
