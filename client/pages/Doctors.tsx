@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Users, Activity, LogOut, ChevronLeft, UserPlus, Stethoscope } from "lucide-react";
+import { Users, Activity, LogOut, ChevronLeft, UserPlus, Stethoscope, Briefcase, Star, Info, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/context/AuthContext";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import type { Doctor } from "@shared/api";
 
 const DoctorsPage = () => {
@@ -88,7 +94,58 @@ const DoctorsPage = () => {
                     </span>
                   </div>
                   <h3 className="text-lg font-bold text-foreground mb-1">{doctor.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{doctor.specialization}</p>
+                  <p className="text-sm text-muted-foreground mb-3">{doctor.specialization}</p>
+                  
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-1 text-xs px-2 py-0.5 bg-primary/5 text-primary rounded-md border border-primary/10">
+                      <Briefcase className="w-3 h-3" />
+                      <span>{doctor.experience} Yrs Exp</span>
+                    </div>
+                  </div>
+
+                  <Accordion type="single" collapsible className="w-full mb-4">
+                    <AccordionItem value="bio" className="border-none">
+                      <AccordionTrigger className="py-2 text-xs hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <Info className="w-3.5 h-3.5 text-primary" />
+                          <span>Doctor Biography</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-xs text-muted-foreground leading-relaxed pt-1">
+                        {doctor.bio}
+                      </AccordionContent>
+                    </AccordionItem>
+                    
+                    <AccordionItem value="feedback" className="border-none">
+                      <AccordionTrigger className="py-2 text-xs hover:no-underline">
+                        <div className="flex items-center gap-2">
+                          <MessageSquare className="w-3.5 h-3.5 text-primary" />
+                          <span>Patient Feedback ({doctor.feedback?.length || 0})</span>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-1">
+                        {doctor.feedback && doctor.feedback.length > 0 ? (
+                          <div className="space-y-3">
+                            {doctor.feedback.map((f, i) => (
+                              <div key={i} className="bg-muted/30 p-2 rounded-lg border border-border/50">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-[10px] font-bold text-foreground">{f.patientName}</span>
+                                  <div className="flex items-center gap-0.5">
+                                    {[...Array(5)].map((_, idx) => (
+                                      <Star key={idx} className={`w-2.5 h-2.5 ${idx < f.rating ? 'text-yellow-500 fill-yellow-500' : 'text-muted'}`} />
+                                    ))}
+                                  </div>
+                                </div>
+                                <p className="text-[10px] italic text-muted-foreground">"{f.comment}"</p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-[10px] text-muted-foreground italic">No feedback yet.</p>
+                        )}
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
                   
                   <div className="space-y-4">
                     <div>

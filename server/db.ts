@@ -26,6 +26,13 @@ export interface Doctor {
   status: "available" | "busy" | "break";
   currentPatients: number;
   maxCapacity: number;
+  experience: number; // Years of experience
+  bio: string; // Doctor biodata
+  feedback: {
+    rating: number;
+    comment: string;
+    patientName: string;
+  }[];
 }
 
 export interface Appointment {
@@ -195,6 +202,12 @@ let doctors: Doctor[] = [
     status: "busy",
     currentPatients: 2,
     maxCapacity: 5,
+    experience: 12,
+    bio: "Specialist in trauma and acute care with over a decade of experience in high-pressure emergency departments.",
+    feedback: [
+      { rating: 5, comment: "Incredible doctor, saved my life!", patientName: "John Smith" },
+      { rating: 4, comment: "Very professional and calm.", patientName: "Emma Davis" }
+    ]
   },
   {
     id: "D002",
@@ -203,6 +216,11 @@ let doctors: Doctor[] = [
     status: "busy",
     currentPatients: 1,
     maxCapacity: 4,
+    experience: 15,
+    bio: "Board-certified cardiologist focusing on preventative heart health and complex cardiovascular conditions.",
+    feedback: [
+      { rating: 5, comment: "Extremely knowledgeable and caring.", patientName: "Robert Brown" }
+    ]
   },
   {
     id: "D003",
@@ -211,6 +229,11 @@ let doctors: Doctor[] = [
     status: "available",
     currentPatients: 0,
     maxCapacity: 5,
+    experience: 8,
+    bio: "Expert in sports medicine and joint replacement surgery, helping patients regain mobility.",
+    feedback: [
+      { rating: 5, comment: "Back on my feet thanks to Dr. Lee!", patientName: "Sophia Garcia" }
+    ]
   },
   {
     id: "D004",
@@ -219,6 +242,9 @@ let doctors: Doctor[] = [
     status: "break",
     currentPatients: 0,
     maxCapacity: 6,
+    experience: 20,
+    bio: "Family physician dedicated to holistic care and long-term wellness for patients of all ages.",
+    feedback: []
   },
   {
     id: "D005",
@@ -227,6 +253,11 @@ let doctors: Doctor[] = [
     status: "available",
     currentPatients: 0,
     maxCapacity: 4,
+    experience: 10,
+    bio: "Compassionate pediatrician specializing in childhood development and chronic pediatric conditions.",
+    feedback: [
+      { rating: 5, comment: "Wonderful with my kids!", patientName: "David Miller" }
+    ]
   },
   {
     id: "D006",
@@ -235,6 +266,9 @@ let doctors: Doctor[] = [
     status: "available",
     currentPatients: 0,
     maxCapacity: 3,
+    experience: 18,
+    bio: "Leading neurologist focused on headache management and neuro-rehabilitation.",
+    feedback: []
   },
 ];
 

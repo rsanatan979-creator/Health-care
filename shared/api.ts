@@ -49,6 +49,13 @@ export interface Doctor {
   status: "available" | "busy" | "break";
   currentPatients: number;
   maxCapacity: number;
+  experience: number;
+  bio: string;
+  feedback: {
+    rating: number;
+    comment: string;
+    patientName: string;
+  }[];
 }
 
 export interface DoctorsResponse {
