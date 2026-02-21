@@ -8,11 +8,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-// Pages
 import Landing from "./pages/Landing";
-import SignIn from "./pages/SignIn";
+import Login from "./pages/Login";
+import SosIndex from "./features/sos/pages/SosIndex";
 import HospitalSelection from "./pages/HospitalSelection";
-import Index from "./pages/Index";
+import Dashboard from "./pages/Index";
 import AddPatient from "./pages/AddPatient";
 import Schedule from "./pages/Schedule";
 import BookPatient from "./pages/BookPatient";
@@ -33,11 +33,10 @@ const App = () => (
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Landing />} />
-            <Route path="/signin" element={<SignIn />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/sos" element={<SosIndex />} />
 
-            {/* Protected Routes */}
             <Route
               path="/hospital-selection"
               element={
@@ -50,76 +49,19 @@ const App = () => (
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Index />
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/add-patient"
-              element={
-                <ProtectedRoute>
-                  <AddPatient />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/schedule"
-              element={
-                <ProtectedRoute>
-                  <Schedule />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/book-patient"
-              element={
-                <ProtectedRoute>
-                  <BookPatient />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/analytics"
-              element={
-                <ProtectedRoute>
-                  <Analytics />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/doctors"
-              element={
-                <ProtectedRoute>
-                  <Doctors />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/patients/:patientId"
-              element={
-                <ProtectedRoute>
-                  <PatientDetails />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/optimization"
-              element={
-                <ProtectedRoute>
-                  <Optimization />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/alerts"
-              element={
-                <ProtectedRoute>
-                  <Alerts />
-                </ProtectedRoute>
-              }
-            />
+            <Route path="/add-patient" element={<ProtectedRoute><AddPatient /></ProtectedRoute>} />
+            <Route path="/schedule" element={<ProtectedRoute><Schedule /></ProtectedRoute>} />
+            <Route path="/book-patient" element={<ProtectedRoute><BookPatient /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/doctors" element={<ProtectedRoute><Doctors /></ProtectedRoute>} />
+            <Route path="/patients/:patientId" element={<ProtectedRoute><PatientDetails /></ProtectedRoute>} />
+            <Route path="/optimization" element={<ProtectedRoute><Optimization /></ProtectedRoute>} />
+            <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
 
-            {/* 404 Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

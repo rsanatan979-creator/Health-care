@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { ROUTES } from "@shared/routes";
 import {
   Activity,
   Clock,
@@ -18,7 +19,7 @@ const Landing = () => {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link to={ROUTES.LANDING} className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg">
               H
             </div>
@@ -26,13 +27,18 @@ const Landing = () => {
               <h1 className="text-xl font-bold text-foreground">MediQueue</h1>
               <p className="text-xs text-muted-foreground">Smart Hospital Queue</p>
             </div>
+          </Link>
+          <div className="flex items-center gap-3">
+            <Button asChild variant="ghost" size="sm">
+              <Link to={ROUTES.SOS}>Emergency (SOS)</Link>
+            </Button>
+            <Button asChild className="gap-2">
+              <Link to={ROUTES.LOGIN}>
+                Sign In
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
           </div>
-          <Button asChild className="gap-2">
-            <Link to="/signin">
-              Sign In
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
         </div>
       </nav>
 
@@ -60,7 +66,7 @@ const Landing = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button asChild size="lg" className="gap-2">
-              <Link to="/signin">
+              <Link to={ROUTES.LOGIN}>
                 Get Started
                 <ArrowRight className="w-5 h-5" />
               </Link>
@@ -237,7 +243,7 @@ const Landing = () => {
             MediQueue.
           </p>
           <Button asChild size="lg" className="gap-2">
-            <Link to="/signin">
+            <Link to={ROUTES.LOGIN}>
               Start Your Free Trial
               <ArrowRight className="w-5 h-5" />
             </Link>
