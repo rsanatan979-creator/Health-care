@@ -105,20 +105,20 @@ export function createServer() {
       res.status(500).json({ success: false, error: "Failed to fetch doctors" });
     }
   });
-  app.get("/api/doctors/:id", (req, res, next) => {
-    try {
-      getDoctorById(req, res, next);
-    } catch (error) {
-      console.error("Error in /api/doctors/:id:", error);
-      res.status(500).json({ success: false, error: "Failed to fetch doctor" });
-    }
-  });
   app.get("/api/doctors/available", (req, res, next) => {
     try {
       getAvailableDoctors(req, res, next);
     } catch (error) {
       console.error("Error in /api/doctors/available:", error);
       res.status(500).json({ success: false, error: "Failed to fetch available doctors" });
+    }
+  });
+  app.get("/api/doctors/:id", (req, res, next) => {
+    try {
+      getDoctorById(req, res, next);
+    } catch (error) {
+      console.error("Error in /api/doctors/:id:", error);
+      res.status(500).json({ success: false, error: "Failed to fetch doctor" });
     }
   });
   app.put("/api/doctors/:id", (req, res, next) => {
