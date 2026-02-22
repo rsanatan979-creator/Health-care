@@ -155,6 +155,12 @@ const Index = () => {
             </div>
           </div>
           <div className="flex gap-2 items-center">
+            <Button asChild variant="outline" size="sm" className="gap-2">
+              <Link to="/sos" className="gap-2 text-red-600 hover:text-red-700 border-red-200 hover:border-red-300">
+                <AlertCircle className="w-4 h-4" />
+                SOS
+              </Link>
+            </Button>
             <Button
               onClick={handleRefresh}
               variant="outline"
